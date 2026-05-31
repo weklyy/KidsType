@@ -1,0 +1,8 @@
+name = "kidstype"
+compatibility_date = "2024-04-05"
+
+[build]
+command = "npm run build"
+
+[assets]
+directory = "./dist"

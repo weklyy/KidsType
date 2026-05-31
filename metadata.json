@@ -1,0 +1,6 @@
+{
+  "name": "KidsType",
+  "description": "An interactive typing practice game designed for children.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
