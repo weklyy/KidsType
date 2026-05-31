@@ -60,7 +60,7 @@ export default function VirtualKeyboard({ targetKey, pressedKey, isError }: Virt
                     relative flex items-center justify-center
                     ${keyDef.width || 'w-12'} h-12
                     rounded-xl border-b-[6px] border-black/20
-                    shadow-sm font-black text-slate-800
+                    shadow-sm font-black font-mono text-slate-800
                     select-none
                     ${(isTarget || isSpecialTarget) ? 'z-20' : ''}
                     ${(!isActive && (isTarget || isSpecialTarget)) ? 'animate-key-target' : ''}
