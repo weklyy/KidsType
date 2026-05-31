@@ -23,6 +23,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
   
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [lastFreeKey, setLastFreeKey] = useState<string | null>(null);
+  const [freeTypedText, setFreeTypedText] = useState('');
   const [isError, setIsError] = useState(false);
   const [combo, setCombo] = useState(0);
   const [showCombo, setShowCombo] = useState(false);
@@ -30,6 +31,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
   
   const [inputText, setInputText] = useState('');
   const validatedTextRef = useRef('');
+  const lastCompletedWordRef = useRef('');
   const inputRef = useRef<HTMLInputElement>(null);
   const isComposingRef = useRef(false);
 
@@ -66,7 +68,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
     }
   }, [pressedKey, level.mode]);
 
-  const targetChar = level.mode === 'free' ? (lastFreeKey || '') : (currentWord ? currentWord[charIndex]?.toLowerCase() : '');
+  const targetChar = level.mode === 'free' ? '' : (currentWord ? currentWord[charIndex]?.toLowerCase() : '');
   const targetFinger = targetChar ? getFingerForKey(targetChar) : null;
   const pressedFinger = pressedKey ? getFingerForKey(pressedKey) : null;
 
@@ -109,26 +111,35 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
      if (val === validatedTextRef.current) return;
      if (level.mode !== 'free' && contentIndex >= level.content.length) return;
 
-     if (val.length < validatedTextRef.current.length) {
+     let processVal = val;
+     const lastWord = lastCompletedWordRef.current;
+     if (lastWord && processVal.startsWith(lastWord)) {
+         processVal = processVal.substring(lastWord.length);
+     } else if (lastWord && !processVal.startsWith(lastWord) && processVal.length > 0) {
+         lastCompletedWordRef.current = '';
+     }
+
+     if (processVal.length < validatedTextRef.current.length) {
          // Backspace allowed
-         validatedTextRef.current = val;
-         setInputText(val);
-         setCharIndex(val.length);
+         validatedTextRef.current = processVal;
+         setInputText(processVal);
+         setCharIndex(processVal.length);
          return;
      }
 
      const isCaseSensitive = level.stage === 6 || level.stage === 7;
      
      if (level.mode === 'free') {
-         const addedLen = val.length - validatedTextRef.current.length;
-         validatedTextRef.current = val;
-         setInputText(val); 
-         // Don't modify charIndex/contentIndex, we just let inputText grow or stay
-         // Actually, if we let it grow indefinitely it might lag. We can reset it.
+         const newChar = processVal.slice(-1) || '';
+         const addedLen = processVal.length - validatedTextRef.current.length;
+         validatedTextRef.current = processVal;
          setInputText('');
          validatedTextRef.current = '';
          
          if (addedLen > 0) {
+             if (newChar) {
+                 setFreeTypedText(prev => (prev + newChar).slice(-150)); // keep last 150 characters
+             }
              setTotalStrokes(prev => prev + addedLen);
              setCombo(prev => prev + addedLen);
              playCorrectSound();
@@ -138,19 +149,19 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
      }
 
      const targetPrefix = isCaseSensitive 
-       ? currentWord.substring(0, val.length)
-       : currentWord.substring(0, val.length).toLowerCase();
+       ? currentWord.substring(0, processVal.length)
+       : currentWord.substring(0, processVal.length).toLowerCase();
        
      const typedPrefix = isCaseSensitive
-       ? val
-       : val.toLowerCase();
+       ? processVal
+       : processVal.toLowerCase();
 
      if (targetPrefix === typedPrefix) {
          // Correct!
-         const addedLen = val.length - validatedTextRef.current.length;
-         validatedTextRef.current = val;
-         setInputText(val); 
-         setCharIndex(val.length);
+         const addedLen = processVal.length - validatedTextRef.current.length;
+         validatedTextRef.current = processVal;
+         setInputText(processVal); 
+         setCharIndex(processVal.length);
          setIsError(false);
          
          if (addedLen > 0) {
@@ -160,7 +171,8 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
              spawnParticle();
          }
 
-         if (val.length === currentWord.length) {
+         if (processVal.length === currentWord.length) {
+             lastCompletedWordRef.current = processVal;
              setContentIndex(prev => prev + 1);
              setCharIndex(0);
              setInputText('');
@@ -174,8 +186,8 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
          setCombo(0);
          setTotalStrokes(prev => prev + 1);
          
-         if (currentWord[val.length - 1]) {
-             const expectedChar = isCaseSensitive ? currentWord[val.length - 1] : currentWord[val.length - 1].toLowerCase();
+         if (currentWord[processVal.length - 1]) {
+             const expectedChar = isCaseSensitive ? currentWord[processVal.length - 1] : currentWord[processVal.length - 1].toLowerCase();
              setMistakeKeys(prev => ({ ...prev, [expectedChar]: (prev[expectedChar] || 0) + 1 }));
          }
 
@@ -373,7 +385,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
       <div className="flex-1 min-h-0 flex flex-col items-center pt-8 pb-2 px-4 md:px-8 relative justify-start w-full mt-4">
         
         {/* Combo Indicator (Absolute positioned between header and text container) */}
-        <div className="absolute top-0 left-0 right-0 h-16 flex justify-center items-start pointer-events-none z-50">
+        <div className="absolute -top-8 left-0 right-0 flex justify-center items-start pointer-events-none z-[100]">
            <AnimatePresence>
              {showCombo && (
                <motion.div 
@@ -426,7 +438,26 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
              autoCorrect="off"
           />
 
-          {level.mode === 'free' ? null : !isPracticeMode ? (
+          {level.mode === 'free' ? (
+             <div className="w-full max-w-5xl mx-auto rounded-[2rem] bg-white/90 backdrop-blur-sm shadow-xl border-b-[6px] border-sky-100 flex flex-col items-center justify-center p-8 min-h-[22vh] relative z-10 w-full mb-4 overflow-hidden">
+                 <div className="text-2xl md:text-5xl font-mono font-bold text-slate-800 tracking-wider break-all w-full text-center leading-relaxed max-h-[16vh] overflow-y-auto custom-scrollbar flex items-end justify-center">
+                     <div>
+                     {freeTypedText ? (
+                         <>
+                             <span className="text-slate-400">{freeTypedText.slice(0, -1)}</span>
+                             <span className="text-sky-500 font-black drop-shadow-sm scale-[1.1] inline-block mx-1 border-b-[4px] border-sky-500">{freeTypedText.slice(-1)}</span>
+                             <span className="inline-block w-[4px] h-6 md:h-10 bg-sky-500 ml-1 animate-pulse align-middle rounded-full"></span>
+                         </>
+                     ) : (
+                         <span className="text-slate-300">
+                             {lang === 'zh' ? "任意敲击键盘开始..." : "Type anything to start..."}
+                             <span className="inline-block w-[4px] h-6 md:h-10 bg-sky-300 ml-1 animate-pulse align-middle rounded-full"></span>
+                         </span>
+                     )}
+                     </div>
+                 </div>
+             </div>
+          ) : !isPracticeMode ? (
           <AnimatePresence mode="wait">
             <motion.div
               key={contentIndex}

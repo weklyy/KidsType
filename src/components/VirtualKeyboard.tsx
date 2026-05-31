@@ -50,17 +50,22 @@ export default function VirtualKeyboard({ targetKey, pressedKey, isError }: Virt
                   key={keyDef.key}
                   animate={
                     isTarget || isSpecialTarget
-                      ? { y: [0, -6, 0], scale: [1, 1.15, 1], backgroundColor: '#ffffff', boxShadow: [`0px 0px 15px ${baseColor}80`, `0px 0px 30px ${baseColor}`, `0px 0px 15px ${baseColor}80`] }
+                      ? { 
+                          y: [0, -6, 0], 
+                          scale: [1, 1.15, 1], 
+                          backgroundColor: [baseColor, '#ffffff', baseColor], 
+                          boxShadow: [`0px 0px 15px ${baseColor}80`, `0px 0px 30px ${baseColor}`, `0px 0px 15px ${baseColor}80`] 
+                        }
                       : isActive && isError
-                      ? { x: [-4, 4, -4, 4, 0], y: 6, scale: 0.9, backgroundColor: '#ef4444', color: '#ffffff', boxShadow: ['inset 0 4px 10px rgba(0,0,0,0.5)'] } // shake red on error
+                      ? { x: [-4, 4, -4, 4, 0], y: 6, scale: 0.9, backgroundColor: '#ef4444', color: '#ffffff', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)' } 
                       : isActive 
-                      ? { y: 6, scale: 0.9, backgroundColor: '#22c55e', color: '#ffffff', boxShadow: ['inset 0 4px 10px rgba(0,0,0,0.5)'] } // green pulse on typed
-                      : { y: 0, scale: 1, backgroundColor: baseColor, boxShadow: ['0px 2px 5px rgba(0,0,0,0.1)'] }
+                      ? { y: 6, scale: 0.9, backgroundColor: '#22c55e', color: '#ffffff', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)' } 
+                      : { y: 0, scale: 1, backgroundColor: baseColor, boxShadow: '0px 2px 5px rgba(0,0,0,0.1)' }
                   }
                   transition={
                     isTarget || isSpecialTarget
                       ? { repeat: Infinity, duration: 1, ease: "easeInOut" }
-                      : { duration: 0.1 }
+                      : { duration: 0.15 }
                   }
                   className={`
                     relative flex items-center justify-center
@@ -82,15 +87,7 @@ export default function VirtualKeyboard({ targetKey, pressedKey, isError }: Virt
                     {keyDef.display || keyDef.key}
                   </span>
                   
-                  {/* Highlight overlay for target key */}
-                  {(isTarget || isSpecialTarget) && (
-                    <motion.div 
-                      className="absolute inset-0 border-4 rounded-xl"
-                      style={{ borderColor: `${baseColor}80` }}
-                      animate={{ opacity: [0.2, 1, 0.2] }}
-                      transition={{ repeat: Infinity, duration: 1 }}
-                    />
-                  )}
+                  {/* Empty comment to remove overlay */}
                 </motion.div>
               );
             })}

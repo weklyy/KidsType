@@ -46,18 +46,11 @@ export default function VirtualHands({ targetFinger, pressedFinger, isError }: V
         transition={
           isTarget 
             ? { repeat: Infinity, duration: 1, ease: "easeInOut" }
-            : { duration: 0.2 }
+            : { duration: 0.15 }
         }
         style={{ zIndex: isTarget ? 50 : isPressed ? 40 : 1 }}
       >
-        {isTarget && (
-          <motion.div 
-            animate={{ opacity: [0.3, 1, 0.3], boxShadow: [`0 0 10px ${color}4d`, `0 0 25px ${color}cc`, `0 0 10px ${color}4d`] }}
-            transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }}
-            className="absolute inset-x-0 bottom-0 top-0 border-[6px] rounded-t-full"
-            style={{ borderColor: color, backgroundColor: `${color}33` }}
-          />
-        )}
+        {/* Empty comment to remove overlay */}
       </motion.div>
     );
   };
