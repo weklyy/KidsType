@@ -52,9 +52,9 @@ export default function VirtualKeyboard({ targetKey, pressedKey, isError }: Virt
                     isTarget || isSpecialTarget
                       ? { y: [0, -6, 0], scale: [1, 1.15, 1], backgroundColor: '#ffffff' }
                       : isActive && isError
-                      ? { x: [-4, 4, -4, 4, 0], backgroundColor: '#fca5a5' } // shake red on error
+                      ? { x: [-4, 4, -4, 4, 0], y: 6, scale: 0.9, backgroundColor: '#ef4444', color: '#ffffff', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)' } // shake red on error
                       : isActive 
-                      ? { scale: 0.9, backgroundColor: '#86efac' } // green pulse on typed
+                      ? { y: 6, scale: 0.9, backgroundColor: '#22c55e', color: '#ffffff', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)' } // green pulse on typed
                       : { y: 0, scale: 1, backgroundColor: baseColor }
                   }
                   transition={

@@ -27,6 +27,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
   const [particles, setParticles] = useState<{id: number, text: string, x: number}[]>([]);
   
   const [showWarning, setShowWarning] = useState(false);
+  const [showImeWarning, setShowImeWarning] = useState(false);
   const lastKeyTime = useRef<number>(0);
 
   const t = i18n[lang];
@@ -35,6 +36,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
   // Guard against out of bounds if stage finished
   const targetChar = currentWord ? currentWord[charIndex] : '';
   const targetFinger = targetChar ? getFingerForKey(targetChar) : null;
+  const pressedFinger = pressedKey ? getFingerForKey(pressedKey) : null;
 
   useEffect(() => {
     if (contentIndex >= level.content.length) {
@@ -52,13 +54,20 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     // Ignore if done or warning showing
-    if (contentIndex >= level.content.length || showWarning) return;
+    if (contentIndex >= level.content.length || showWarning || showImeWarning) return;
     
     // Ignore modifiers entirely unless they are part of the target string?
     // We actually only want to process actual character outputs, but standard keydown gives us 'Shift'.
     // If the target requires Shift (e.g., 'A'), they just press A while holding shift.
     if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'CapsLock') {
       return; 
+    }
+
+    // Capture Chinese IME attempts and show warning
+    if (e.key === 'Process' || e.key === 'Unidentified' || e.isComposing) {
+      setShowImeWarning(true);
+      setTimeout(() => setShowImeWarning(false), 3000);
+      return;
     }
 
     const now = Date.now();
@@ -101,11 +110,9 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
       if (charIndex + 1 < currentWord.length) {
         setCharIndex(prev => prev + 1);
       } else {
-        // Next word
-        setTimeout(() => {
-          setContentIndex(prev => prev + 1);
-          setCharIndex(0);
-        }, 300); // small delay before next word appears
+        // Next word immediately
+        setContentIndex(prev => prev + 1);
+        setCharIndex(0);
       }
     } else {
       // Incorrect!
@@ -117,15 +124,21 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
       setTimeout(() => setIsError(false), 400); // reset error state
     }
     
-    // Clear pressed key visually
-    setTimeout(() => setPressedKey(null), 150);
+    // pressedKey clear is handled by keyup now
+  }, [contentIndex, charIndex, currentWord, targetChar, level.content.length, showWarning, showImeWarning]);
 
-  }, [contentIndex, charIndex, currentWord, targetChar, level.content.length, showWarning]);
+  const handleKeyUp = useCallback((e: KeyboardEvent) => {
+    setPressedKey(prev => prev === e.key ? null : prev);
+  }, []);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [handleKeyDown, handleKeyUp]);
 
   if (contentIndex >= level.content.length) {
     return (
@@ -155,9 +168,16 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
                </motion.div>
             ))}
           </div>
-          <p className="text-2xl text-slate-600 font-bold mb-8">
-            {t.mistakes} {errors}
-          </p>
+          <div className="flex gap-8 mb-8">
+            <p className="text-2xl text-slate-600 font-bold flex flex-col items-center gap-2">
+              <span className="text-red-400"><XCircle size={32} /></span>
+              <span>{t.mistakes} {errors}</span>
+            </p>
+            <p className="text-2xl text-slate-600 font-bold flex flex-col items-center gap-2">
+              <span className="text-green-500"><Star size={32} /></span>
+              <span>{t.accuracy} {totalStrokes === 0 ? 100 : Math.max(0, Math.round(100 - (errors / totalStrokes) * 100))}%</span>
+            </p>
+          </div>
           <button 
             onClick={onBack}
             className="px-8 py-4 bg-sky-500 hover:bg-sky-400 text-white text-2xl font-bold rounded-2xl shadow-lg transition-transform active:scale-95"
@@ -198,6 +218,10 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
           <div className="flex items-center gap-2">
             <XCircle className="text-red-400" /> 
             {errors}
+          </div>
+          <div className="w-px h-6 bg-slate-200" />
+          <div className="flex items-center gap-2 text-green-500">
+            {totalStrokes === 0 ? 100 : Math.max(0, Math.round(100 - (errors / totalStrokes) * 100))}%
           </div>
         </div>
       </div>
@@ -276,6 +300,21 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
           )}
         </AnimatePresence>
 
+        {/* IME Warning Toast */}
+        <AnimatePresence>
+          {showImeWarning && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="absolute top-1/4 z-50 bg-red-100 border-4 border-red-400 text-red-700 px-8 py-4 rounded-3xl font-bold text-2xl shadow-xl flex items-center gap-4 animate-shake"
+            >
+              <div className="text-4xl">⚠️</div>
+              {t.imeWarning}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Middle: Keyboard */}
         <div className="w-full relative z-10 scale-90 lg:scale-100">
              <VirtualKeyboard 
@@ -289,7 +328,11 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
       
       {/* Bottom: Hands */}
       <div className="h-48 shrink-0 flex items-end justify-center w-full pb-8">
-          <VirtualHands targetFinger={targetFinger} />
+          <VirtualHands 
+            targetFinger={targetFinger} 
+            pressedFinger={pressedFinger}
+            isError={isError}
+          />
       </div>
 
     </div>
