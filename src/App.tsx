@@ -8,6 +8,7 @@ import { ViewState, Level, Language } from './types';
 import MainMenu from './components/MainMenu';
 import LevelMap from './components/LevelMap';
 import TypingGame from './components/TypingGame';
+import PracticeMenu from './components/PracticeMenu';
 
 export default function App() {
   const [view, setView] = useState<ViewState>('menu');
@@ -33,7 +34,7 @@ export default function App() {
   }, []);
 
   const handleLevelComplete = (stars: number) => {
-    if (selectedLevel) {
+    if (selectedLevel && selectedLevel.stage <= 10) {
       setCompletedStages(prev => {
         const currentStars = prev[selectedLevel.id] || 0;
         const newStages = {
@@ -43,8 +44,11 @@ export default function App() {
         localStorage.setItem('kidsTypeProgress', JSON.stringify(newStages));
         return newStages;
       });
+      setView('map');
+    } else {
+      // It was a practice level
+      setView('practice');
     }
-    setView('map');
   };
   
   const handleSetLang = (newLang: Language) => {
@@ -55,7 +59,12 @@ export default function App() {
   return (
     <div className="w-full h-screen bg-slate-50 font-sans selection:bg-sky-200">
       {view === 'menu' && (
-        <MainMenu onStart={() => setView('map')} lang={lang} setLang={handleSetLang} />
+        <MainMenu 
+          onStart={() => setView('map')} 
+          onPractice={() => setView('practice')}
+          lang={lang} 
+          setLang={handleSetLang} 
+        />
       )}
       
       {view === 'map' && (
@@ -69,12 +78,23 @@ export default function App() {
           }}
         />
       )}
+
+      {view === 'practice' && (
+        <PracticeMenu 
+          lang={lang}
+          onBack={() => setView('menu')}
+          onSelectArticle={(level) => {
+             setSelectedLevel(level);
+             setView('game');
+          }}
+        />
+      )}
       
       {view === 'game' && selectedLevel && (
         <TypingGame 
           lang={lang}
           level={selectedLevel}
-          onBack={() => setView('map')}
+          onBack={() => setView(selectedLevel.stage > 100 ? 'practice' : 'map')}
           onComplete={handleLevelComplete}
         />
       )}

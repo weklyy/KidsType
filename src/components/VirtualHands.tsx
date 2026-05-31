@@ -24,10 +24,10 @@ export default function VirtualHands({ targetFinger, pressedFinger, isError }: V
         animate={
           isTarget 
             ? { 
-                y: -30, 
-                scale: 1.15,
-                backgroundColor: '#ffffff', 
-                boxShadow: `0 0 35px ${color}, 0 0 20px #fbbf24, inset 0 -10px 15px ${color}`
+                y: [0, -6, 0], 
+                scale: [1, 1.05, 1],
+                backgroundColor: [color, '#ffffff', color], 
+                boxShadow: [`0 0 15px ${color}`, `0 0 30px ${color}`, `0 0 15px ${color}`]
               }
             : isPressed
             ? {
@@ -43,31 +43,27 @@ export default function VirtualHands({ targetFinger, pressedFinger, isError }: V
                 boxShadow: 'none'
               }
         }
-        transition={{ duration: 0.2 }}
+        transition={
+          isTarget 
+            ? { repeat: Infinity, duration: 1, ease: "easeInOut" }
+            : { duration: 0.2 }
+        }
         style={{ zIndex: isTarget ? 50 : isPressed ? 40 : 1 }}
       >
         {isTarget && (
           <motion.div 
-            animate={{ y: [0, -10, 0], scale: [1, 1.1, 1] }}
-            transition={{ repeat: Infinity, duration: 1 }}
-            className="absolute -top-14 flex flex-col items-center"
-          >
-             <div className="w-8 h-8 rounded-full bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.9)] border-[3px] border-white flex justify-center items-center z-50">
-                 <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
-             </div>
-             <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-amber-400 mt-1" />
-          </motion.div>
-        )}
-        
-        {isTarget && (
-          <div className="absolute inset-0 border-[3px] border-amber-400 rounded-t-full opacity-90 shadow-inner" />
+            animate={{ opacity: [0.3, 1, 0.3], boxShadow: [`0 0 10px ${color}4d`, `0 0 25px ${color}cc`, `0 0 10px ${color}4d`] }}
+            transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }}
+            className="absolute inset-x-0 bottom-0 top-0 border-[6px] rounded-t-full"
+            style={{ borderColor: color, backgroundColor: `${color}33` }}
+          />
         )}
       </motion.div>
     );
   };
 
   return (
-    <div className="w-full flex justify-center items-end gap-24 h-48 mt-8">
+    <div className="w-full flex justify-center items-end gap-16 md:gap-24 h-40 mt-4">
       
       {/* Left Hand */}
       <div className="relative flex items-end gap-1">

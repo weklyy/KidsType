@@ -85,6 +85,7 @@ export const KEYBOARD_ROWS: KeyMap[][] = [
 ];
 
 export function getFingerForKey(targetKey: string): FingerId | null {
+  if (!targetKey) return null;
   const upperKey = targetKey.toUpperCase();
   
   if (targetKey === ' ') return 'L5'; // Use L5 for space (thumb)

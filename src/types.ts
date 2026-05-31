@@ -9,12 +9,18 @@ export interface KeyMap {
   width?: string;
 }
 
+export interface LevelContent {
+  text: string;
+  pinyin?: string;
+}
+
 export interface Level {
   id: number;
   title: { en: string; zh: string };
   description: { en: string; zh: string };
-  content: string[]; // words or characters to type
+  content: (string | LevelContent | any)[]; // words or characters to type
   stage: number;
+  mode?: 'standard' | 'poem' | 'free';
 }
 
-export type ViewState = 'menu' | 'map' | 'game';
+export type ViewState = 'menu' | 'map' | 'game' | 'practice';

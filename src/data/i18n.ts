@@ -2,10 +2,10 @@ export type Language = 'en' | 'zh';
 
 export const i18n = {
   en: {
-    title: 'KidsType',
-    subtitle: 'Keyboard Adventures! 🚀',
-    play: 'PLAY',
-    adventureMap: 'Adventure Map',
+    title: 'YiTyping',
+    subtitle: 'Touch Typing Practice Online',
+    play: 'Start Learning',
+    adventureMap: 'Stages Map',
     home: 'Home',
     levelComplete: 'Level Complete!',
     mistakes: 'Mistakes:',
@@ -13,13 +13,18 @@ export const i18n = {
     continue: 'Continue',
     warning: 'Whoa there! Take your time, focus on the fingers!',
     backToMap: 'Back to Map',
-    imeWarning: 'Please switch to English input method! (Disable IME)'
+    imeWarning: 'Please switch to English input method! (Disable IME)',
+    freePractice: 'Free Practice',
+    freePracticeMode: 'Free Practice & Poems',
+    selectPoem: 'Select a poem/article',
+    freeTyping: 'Free Typing',
+    start: 'Start',
   },
   zh: {
-    title: '键盘小能手',
-    subtitle: '键盘大冒险！🚀',
+    title: '易打字',
+    subtitle: '在线指法跟练器_零基础盲打练习',
     play: '开始闯关',
-    adventureMap: '探险地图',
+    adventureMap: '练习关卡',
     home: '主页',
     levelComplete: '闯关成功！',
     mistakes: '错误数：',
@@ -27,6 +32,11 @@ export const i18n = {
     continue: '继续',
     warning: '慢一点哦！慢慢找准对应的小手指！',
     backToMap: '返回地图',
-    imeWarning: '请切换到【英文输入法】！(关闭中文输入)'
+    imeWarning: '请切换到【英文输入法】！(关闭中文输入)',
+    freePractice: '自由练习',
+    freePracticeMode: '自由练习模式',
+    selectPoem: '选择古诗 / 文章',
+    freeTyping: '自由打字 (无限模式)',
+    start: '开始',
   }
 };

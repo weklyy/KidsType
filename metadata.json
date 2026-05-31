@@ -1,6 +1,6 @@
 {
-  "name": "KidsType",
-  "description": "An interactive typing practice game designed for children.",
+  "name": "在线指法跟练器",
+  "description": "易次方出品的易打字（在线指法跟练器），是一款专为零基础用户设计、包含闯关模式和古诗词自由练习的盲打练习网站，无门槛、在线练，帮助您快速掌握键盘盲打指法。",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

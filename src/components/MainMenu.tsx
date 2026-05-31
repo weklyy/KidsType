@@ -1,16 +1,17 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Play } from 'lucide-react';
+import { Play, BookOpen } from 'lucide-react';
 import { Language } from '../types';
 import { i18n } from '../data/i18n';
 
 interface MainMenuProps {
   onStart: () => void;
+  onPractice: () => void;
   lang: Language;
   setLang: (l: Language) => void;
 }
 
-export default function MainMenu({ onStart, lang, setLang }: MainMenuProps) {
+export default function MainMenu({ onStart, onPractice, lang, setLang }: MainMenuProps) {
   const t = i18n[lang];
 
   return (
@@ -64,20 +65,31 @@ export default function MainMenu({ onStart, lang, setLang }: MainMenuProps) {
           </p>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onStart}
-          className="group relative flex items-center gap-4 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-amber-900 px-12 py-6 rounded-[2.5rem] shadow-[0_10px_0_0_#d97706] transition-all hover:shadow-[0_6px_0_0_#d97706] hover:translate-y-1 active:shadow-[0_0px_0_0_#d97706] active:translate-y-[10px]"
-        >
-          <span className="text-4xl font-black tracking-wider">{t.play}</span>
-          <Play size={40} className="fill-amber-900 group-hover:translate-x-2 transition-transform" />
-          
-          {/* Shine effect */}
-          <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden">
-             <div className="w-[200%] h-full bg-white/30 transform -skew-x-12 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000" />
-          </div>
-        </motion.button>
+        <div className="flex flex-col md:flex-row gap-6 mt-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onStart}
+            className="group relative flex items-center justify-center gap-4 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-amber-900 px-10 py-5 rounded-[2rem] shadow-[0_8px_0_0_#d97706] transition-all hover:shadow-[0_4px_0_0_#d97706] hover:translate-y-1 active:shadow-[0_0px_0_0_#d97706] active:translate-y-[8px]"
+          >
+            <span className="text-3xl font-black tracking-wider">{t.play}</span>
+            <Play size={32} className="fill-amber-900 group-hover:translate-x-2 transition-transform" />
+            
+            <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
+               <div className="w-[200%] h-full bg-white/30 transform -skew-x-12 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000" />
+            </div>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onPractice}
+            className="group relative flex items-center justify-center gap-4 bg-white/90 hover:bg-white active:bg-slate-100 text-sky-700 px-10 py-5 rounded-[2rem] shadow-[0_8px_0_0_#bae6fd] border-2 border-sky-200 transition-all hover:shadow-[0_4px_0_0_#bae6fd] hover:translate-y-1 active:shadow-[0_0px_0_0_#bae6fd] active:translate-y-[8px]"
+          >
+            <span className="text-3xl font-black tracking-wider">{t.freePractice}</span>
+            <BookOpen size={32} className="text-sky-500 group-hover:scale-110 transition-transform" />
+          </motion.button>
+        </div>
       </motion.div>
 
     </div>
