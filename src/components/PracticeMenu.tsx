@@ -122,7 +122,7 @@ export default function PracticeMenu({ lang, onBack, onSelectArticle }: Practice
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto w-full p-6 md:p-8 xl:p-12 pb-32">
-         <div className="max-w-[1400px] mx-auto w-full flex flex-col xl:flex-row gap-8 xl:gap-12">
+         <div className="max-w-[1400px] mx-auto w-full flex flex-col gap-8">
             
             {/* Built-in list (Poems) */}
             <div className="flex-1 flex flex-col gap-6">
@@ -183,19 +183,6 @@ export default function PracticeMenu({ lang, onBack, onSelectArticle }: Practice
                   })}
                </div>
             </div>
-
-            <div className="w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent hidden xl:block shrink-0" />
-
-            {/* Right Column: Custom Text & Infinite Playground */}
-            <div className="xl:w-[380px] shrink-0 flex flex-col gap-6">
-               
-
-
-               <div className="flex flex-col gap-4 mt-2">
-                 {/*  Other content or left empty for now as it seems there was just that element */}
-               </div>
-            </div>
-
          </div>
       </div>
     </div>
