@@ -22,8 +22,6 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
   const [totalStrokes, setTotalStrokes] = useState(0);
   
   const [pressedKey, setPressedKey] = useState<string | null>(null);
-  const [lastFreeKey, setLastFreeKey] = useState<string | null>(null);
-  const [freeTypedText, setFreeTypedText] = useState('');
   const [isError, setIsError] = useState(false);
   const [combo, setCombo] = useState(0);
   const [showCombo, setShowCombo] = useState(false);
@@ -53,22 +51,12 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
   }, [contentIndex, level.content]);
 
   const currentItem = level.content[contentIndex];
-  const isPracticeMode = level.mode === 'poem' || level.mode === 'free';
+  const isPracticeMode = level.mode === 'poem';
   const isChineseLevel = typeof currentItem === 'object' && currentItem !== null && currentItem.type !== 'newline';
   const currentWord = isChineseLevel ? ((currentItem as any).pinyin || (currentItem as any).text || '') : (currentItem as string) || '';
   const currentChineseText = isChineseLevel ? (currentItem as any).text : '';
 
-  useEffect(() => {
-    if (level.mode === 'free' && pressedKey) {
-       setLastFreeKey(pressedKey.toLowerCase());
-       const timer = setTimeout(() => {
-           setLastFreeKey(prev => prev === pressedKey.toLowerCase() ? null : prev);
-       }, 1000);
-       return () => clearTimeout(timer);
-    }
-  }, [pressedKey, level.mode]);
-
-  const targetChar = level.mode === 'free' ? '' : (currentWord ? currentWord[charIndex]?.toLowerCase() : '');
+  const targetChar = currentWord ? currentWord[charIndex]?.toLowerCase() : '';
   const targetFinger = targetChar ? getFingerForKey(targetChar) : null;
   const pressedFinger = pressedKey ? getFingerForKey(pressedKey) : null;
 
@@ -109,7 +97,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
 
   const validateInput = useCallback((val: string) => {
      if (val === validatedTextRef.current) return;
-     if (level.mode !== 'free' && contentIndex >= level.content.length) return;
+     if (contentIndex >= level.content.length) return;
 
      let processVal = val;
      const lastWord = lastCompletedWordRef.current;
@@ -129,25 +117,6 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
 
      const isCaseSensitive = level.stage === 6 || level.stage === 7;
      
-     if (level.mode === 'free') {
-         const newChar = processVal.slice(-1) || '';
-         const addedLen = processVal.length - validatedTextRef.current.length;
-         validatedTextRef.current = processVal;
-         setInputText('');
-         validatedTextRef.current = '';
-         
-         if (addedLen > 0) {
-             if (newChar) {
-                 setFreeTypedText(prev => (prev + newChar).slice(-150)); // keep last 150 characters
-             }
-             setTotalStrokes(prev => prev + addedLen);
-             setCombo(prev => prev + addedLen);
-             playCorrectSound();
-             spawnParticle();
-         }
-         return;
-     }
-
      const targetPrefix = isCaseSensitive 
        ? currentWord.substring(0, processVal.length)
        : currentWord.substring(0, processVal.length).toLowerCase();
@@ -213,26 +182,26 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    let key = e.key;
     if (e.key === 'Process' || e.key === 'Unidentified') {
        if (e.code && e.code.startsWith('Key')) {
-           setPressedKey(e.code.replace('Key', ''));
+           key = e.code.replace('Key', '');
        }
-    } else {
-       setPressedKey(e.key);
     }
+    setPressedKey(key);
   };
 
   const handleKeyUp = () => {
       setPressedKey(null);
   };
 
-  if (level.mode !== 'free' && contentIndex >= level.content.length) {
+  if (contentIndex >= level.content.length) {
     const timeSpentMinutes = (Date.now() - startTime) / 60000;
     const wpm = timeSpentMinutes > 0 ? Math.round((totalStrokes / 5) / timeSpentMinutes) : 0;
     const cpm = timeSpentMinutes > 0 ? Math.round(totalStrokes / timeSpentMinutes) : 0;
     const accuracyVal = totalStrokes === 0 ? 100 : Math.max(0, Math.round(100 - (errors / totalStrokes) * 100));
     
-    const sortedMistakes = Object.entries(mistakeKeys).sort((a,b) => b[1]-a[1]).slice(0, 3);
+    const sortedMistakes = Object.entries(mistakeKeys).sort((a,b) => (b[1] as number) - (a[1] as number)).slice(0, 3);
 
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-sky-50 h-full w-full">
@@ -438,26 +407,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
              autoCorrect="off"
           />
 
-          {level.mode === 'free' ? (
-             <div className="w-full max-w-5xl mx-auto rounded-[2rem] bg-white/90 backdrop-blur-sm shadow-xl border-b-[6px] border-sky-100 flex flex-col items-center justify-center p-8 min-h-[22vh] relative z-10 w-full mb-4 overflow-hidden">
-                 <div className="text-2xl md:text-5xl font-mono font-bold text-slate-800 tracking-wider break-all w-full text-center leading-relaxed max-h-[16vh] overflow-y-auto custom-scrollbar flex items-end justify-center">
-                     <div>
-                     {freeTypedText ? (
-                         <>
-                             <span className="text-slate-400">{freeTypedText.slice(0, -1)}</span>
-                             <span className="text-sky-500 font-black drop-shadow-sm scale-[1.1] inline-block mx-1 border-b-[4px] border-sky-500">{freeTypedText.slice(-1)}</span>
-                             <span className="inline-block w-[4px] h-6 md:h-10 bg-sky-500 ml-1 animate-pulse align-middle rounded-full"></span>
-                         </>
-                     ) : (
-                         <span className="text-slate-300">
-                             {lang === 'zh' ? "任意敲击键盘开始..." : "Type anything to start..."}
-                             <span className="inline-block w-[4px] h-6 md:h-10 bg-sky-300 ml-1 animate-pulse align-middle rounded-full"></span>
-                         </span>
-                     )}
-                     </div>
-                 </div>
-             </div>
-          ) : !isPracticeMode ? (
+          {!isPracticeMode ? (
           <AnimatePresence mode="wait">
             <motion.div
               key={contentIndex}
@@ -512,7 +462,7 @@ export default function TypingGame({ level, onComplete, onBack, lang }: TypingGa
                                 </span>
                              )}
 
-                             {(level.mode === 'poem' || level.mode === 'free') && (
+                             {level.mode === 'poem' && (
                                 <span className={`text-lg md:text-xl lg:text-2xl font-black mt-1 ${isPast ? 'text-slate-400' : isActive ? 'text-sky-600 drop-shadow-md scale-[1.1]' : 'text-slate-800'}`}>
                                    {item.text}
                                 </span>

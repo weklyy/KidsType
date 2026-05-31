@@ -24,7 +24,7 @@ interface PracticeMenuProps {
 export default function PracticeMenu({ lang, onBack, onSelectArticle }: PracticeMenuProps) {
   const t = i18n[lang];
   
-  const createLevel = (title: string, rawText: string, mode: 'poem' | 'free' = 'poem') => {
+  const createLevel = (title: string, rawText: string, mode: 'poem' | 'standard' = 'poem') => {
     // Basic tokenizer: separate by Chinese chars and English words
     const tokens: any[] = [];
     
@@ -191,32 +191,8 @@ export default function PracticeMenu({ lang, onBack, onSelectArticle }: Practice
                
 
 
-               {/* 无边界键盘游乐场 */}
                <div className="flex flex-col gap-4 mt-2">
-                  <div className="flex items-center gap-3 px-2">
-                    <div className="p-2.5 bg-indigo-100 rounded-xl">
-                      <Dices size={24} className="text-indigo-600" />
-                    </div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-wide">
-                      {lang === 'zh' ? '无边界游乐场' : 'Infinite Playground'}
-                    </h2>
-                  </div>
-                  <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col h-[280px] items-center justify-center p-6 text-center transition-all">
-                    <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-                       <span className="text-3xl">🙌</span>
-                    </div>
-                    <p className="text-slate-500 mb-6 text-sm px-2">
-                       {lang === 'zh' 
-                          ? '没有指定文字。随意敲击键盘，屏幕会实时显示对应按键和正确的使用手指。' 
-                          : 'No text to type! Just press any key and we highlight the correct finger.'}
-                    </p>
-                    <button
-                      onClick={() => createLevel(lang === 'zh' ? '无边界盲打' : 'Free Typing', '', 'free')}
-                      className="px-8 py-3 bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-base rounded-2xl shadow-[0_4px_0_0_#4338ca] hover:shadow-[0_4px_0_0_#4338ca] active:translate-y-1 active:shadow-none transition-all w-full md:w-auto"
-                    >
-                      {lang === 'zh' ? '立即开始' : 'Start Now'}
-                    </button>
-                  </div>
+                 {/*  Other content or left empty for now as it seems there was just that element */}
                </div>
             </div>
 

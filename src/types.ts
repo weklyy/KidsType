@@ -20,7 +20,7 @@ export interface Level {
   description: { en: string; zh: string };
   content: (string | LevelContent | any)[]; // words or characters to type
   stage: number;
-  mode?: 'standard' | 'poem' | 'free';
+  mode?: 'standard' | 'poem';
 }
 
 export type ViewState = 'menu' | 'map' | 'game' | 'practice';

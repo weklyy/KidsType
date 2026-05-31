@@ -4,7 +4,42 @@
   .perspective-1000 {
     perspective: 1000px;
   }
+
+  @keyframes key-target-blink {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      background-color: var(--target-base-color);
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    }
+    50% {
+      transform: translateY(-6px) scale(1.15);
+      background-color: #ffffff;
+      box-shadow: 0px 0px 30px var(--target-base-color);
+    }
+  }
+
+  .animate-key-target {
+    animation: key-target-blink 1s ease-in-out infinite;
+  }
+
+  @keyframes hand-target-blink {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      background-color: var(--target-base-color);
+      box-shadow: none;
+    }
+    50% {
+      transform: translateY(-6px) scale(1.05);
+      background-color: #ffffff;
+      box-shadow: 0 0 30px var(--target-base-color);
+    }
+  }
+
+  .animate-hand-target {
+    animation: hand-target-blink 1s ease-in-out infinite;
+  }
 }
+
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }

@@ -20,16 +20,9 @@ export default function VirtualHands({ targetFinger, pressedFinger, isError }: V
     
     return (
       <motion.div 
-        className={`relative flex items-end justify-center ${width} ${height} rounded-t-full ${offset} ${rotate} transform origin-bottom border-b-2 border-black/10`}
+        className={`relative flex items-end justify-center ${width} ${height} rounded-t-full ${offset} ${rotate} transform origin-bottom border-b-2 border-black/10 ${(!isPressed && isTarget) ? 'animate-hand-target' : ''}`}
         animate={
-          isTarget 
-            ? { 
-                y: [0, -6, 0], 
-                scale: [1, 1.05, 1],
-                backgroundColor: [color, '#ffffff', color], 
-                boxShadow: [`0 0 15px ${color}`, `0 0 30px ${color}`, `0 0 15px ${color}`]
-              }
-            : isPressed
+          isPressed
             ? {
                 y: 10,
                 scale: 0.9,
@@ -43,12 +36,11 @@ export default function VirtualHands({ targetFinger, pressedFinger, isError }: V
                 boxShadow: 'none'
               }
         }
-        transition={
-          isTarget 
-            ? { repeat: Infinity, duration: 1, ease: "easeInOut" }
-            : { duration: 0.15 }
-        }
-        style={{ zIndex: isTarget ? 50 : isPressed ? 40 : 1 }}
+        transition={{ duration: 0 }}
+        style={{ 
+          zIndex: isTarget ? 50 : isPressed ? 40 : 1,
+          '--target-base-color': color,
+        } as React.CSSProperties}
       >
         {/* Empty comment to remove overlay */}
       </motion.div>

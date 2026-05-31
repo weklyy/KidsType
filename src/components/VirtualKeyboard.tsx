@@ -49,24 +49,13 @@ export default function VirtualKeyboard({ targetKey, pressedKey, isError }: Virt
                 <motion.div
                   key={keyDef.key}
                   animate={
-                    isTarget || isSpecialTarget
-                      ? { 
-                          y: [0, -6, 0], 
-                          scale: [1, 1.15, 1], 
-                          backgroundColor: [baseColor, '#ffffff', baseColor], 
-                          boxShadow: [`0px 0px 15px ${baseColor}80`, `0px 0px 30px ${baseColor}`, `0px 0px 15px ${baseColor}80`] 
-                        }
-                      : isActive && isError
+                    isActive && isError
                       ? { x: [-4, 4, -4, 4, 0], y: 6, scale: 0.9, backgroundColor: '#ef4444', color: '#ffffff', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)' } 
                       : isActive 
                       ? { y: 6, scale: 0.9, backgroundColor: '#22c55e', color: '#ffffff', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)' } 
-                      : { y: 0, scale: 1, backgroundColor: baseColor, boxShadow: '0px 2px 5px rgba(0,0,0,0.1)' }
+                      : { y: 0, x: 0, scale: 1, backgroundColor: baseColor, boxShadow: '0px 2px 5px rgba(0,0,0,0.1)' }
                   }
-                  transition={
-                    isTarget || isSpecialTarget
-                      ? { repeat: Infinity, duration: 1, ease: "easeInOut" }
-                      : { duration: 0.15 }
-                  }
+                  transition={{ duration: 0 }}
                   className={`
                     relative flex items-center justify-center
                     ${keyDef.width || 'w-12'} h-12
@@ -74,11 +63,11 @@ export default function VirtualKeyboard({ targetKey, pressedKey, isError }: Virt
                     shadow-sm font-black text-slate-800
                     select-none
                     ${(isTarget || isSpecialTarget) ? 'z-20' : ''}
+                    ${(!isActive && (isTarget || isSpecialTarget)) ? 'animate-key-target' : ''}
                   `}
                   style={{ 
-                    backgroundColor: isTarget || isSpecialTarget ? '#ffffff' : baseColor,
-                    ...(isTarget || isSpecialTarget ? { boxShadow: `0 0 0 6px ${baseColor}b3`, borderColor: baseColor } : {})
-                  }}
+                    '--target-base-color': baseColor,
+                  } as React.CSSProperties}
                 >
                   <span 
                     className={`text-lg transition-transform ${isTarget || isSpecialTarget ? 'scale-125 font-black' : 'opacity-80'}`}
