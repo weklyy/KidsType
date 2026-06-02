@@ -2,7 +2,7 @@ export type Language = 'en' | 'zh';
 
 export const i18n = {
   en: {
-    title: 'YiTyping',
+    title: 'Yidazi',
     subtitle: 'Touch Typing Practice Online',
     play: 'Start Learning',
     adventureMap: 'Stages Map',

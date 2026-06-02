@@ -18,7 +18,7 @@ export default function App() {
 
   // Load progress and language from local storage
   useEffect(() => {
-    const savedProgress = localStorage.getItem('kidsTypeProgress');
+    const savedProgress = localStorage.getItem('yidaziProgress');
     if (savedProgress) {
       try {
         setCompletedStages(JSON.parse(savedProgress));
@@ -27,7 +27,7 @@ export default function App() {
       }
     }
     
-    const savedLang = localStorage.getItem('kidsTypeLang') as Language;
+    const savedLang = localStorage.getItem('yidaziLang') as Language;
     if (savedLang && (savedLang === 'en' || savedLang === 'zh')) {
         setLang(savedLang);
     }
@@ -41,7 +41,7 @@ export default function App() {
           ...prev,
           [selectedLevel.id]: Math.max(currentStars, stars)
         };
-        localStorage.setItem('kidsTypeProgress', JSON.stringify(newStages));
+        localStorage.setItem('yidaziProgress', JSON.stringify(newStages));
         return newStages;
       });
       setView('map');
@@ -53,7 +53,7 @@ export default function App() {
   
   const handleSetLang = (newLang: Language) => {
       setLang(newLang);
-      localStorage.setItem('kidsTypeLang', newLang);
+      localStorage.setItem('yidaziLang', newLang);
   };
 
   return (
