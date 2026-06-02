@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="100%" alt="Yidazi Banner" src="assets/readme/banner_v2.png" />
+  <img width="100%" alt="Yidazi Banner" src="assets/readme/banner_v3.png" />
 </div>
 
 <br />
